@@ -11,7 +11,7 @@ cargo build
 ## Run
 
 ```
-cargo run
+cargo run  # Must be run at root of project for static resources to load correctly
 ```
 
 In a separate shell you can `curl` the endpoint:
