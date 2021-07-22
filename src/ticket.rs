@@ -64,7 +64,7 @@ async fn delete_ticket(data: web::Data<AppState>, ticket_id: web::Json<Uuid>) ->
     if let Some(ticket) = tickets.remove(&ticket_id) {
         return HttpResponse::Ok().json(ticket);
     } else {
-        HttpResponse::BadRequest().body("No such ticket exists")
+        HttpResponse::BadRequest().json("No such ticket exists")
     }
 }
 

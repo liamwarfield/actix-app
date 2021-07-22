@@ -88,8 +88,8 @@ async fn create_user_form(
 async fn delete_user(user_id: web::Json<Uuid>, data: web::Data<AppState>) -> HttpResponse {
     let user_id = user_id.into_inner();
     let mut users = data.users.write().unwrap();
-    if let Some(_) = users.remove(&user_id) {
-        HttpResponse::Ok().body(format!("Deleting user {}!", user_id))
+    if let Some(user) = users.remove(&user_id) {
+        HttpResponse::Ok().json(user)
     } else {
         // Not sure if this is the correct responce code. This would be
         // something I would ask/see if it comes up in code review.

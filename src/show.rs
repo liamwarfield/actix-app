@@ -45,24 +45,20 @@ async fn get_show(show_id: web::Json<Uuid>, data: web::Data<AppState>) -> HttpRe
 // This would take in some type of session/JWT token and do
 // real auth.
 #[actix_web::get("/create/")]
-async fn create_show(
-    data: web::Data<AppState>,
-    user_id: web::Json<Uuid>,
-    show: web::Json<Show>,
-) -> HttpResponse {
+async fn create_show(data: web::Data<AppState>, info: web::Json<(Uuid, Show)>) -> HttpResponse {
     let mut shows = data.shows.write().unwrap();
     let users = data.users.read().unwrap();
-    let show = show.into_inner();
+    let (user_id, show) = info.into_inner();
 
-    if let Some(user) = users.get(&user_id.into_inner()) {
+    if let Some(user) = users.get(&user_id) {
         if matches!(user.role, Role::Admin) {
             shows.insert(show.id, show.clone());
             return HttpResponse::Ok().json(show);
         } else {
-            HttpResponse::Unauthorized().body("User Lacks authority to create a show")
+            HttpResponse::Unauthorized().json("User Lacks authority to create a show")
         }
     } else {
-        HttpResponse::Unauthorized().body("User Lacks authority to create a show")
+        HttpResponse::Unauthorized().json("User Lacks authority to create a show")
     }
 }
 
@@ -81,13 +77,13 @@ async fn delete_show(
             if let Some(show) = shows.remove(&show_id) {
                 return HttpResponse::Ok().json(show);
             } else {
-                HttpResponse::BadRequest().body("No such show exists")
+                HttpResponse::BadRequest().json("No such show exists")
             }
         } else {
-            HttpResponse::Unauthorized().body("User Lacks authority to create a show")
+            HttpResponse::Unauthorized().json("User Lacks authority to create a show")
         }
     } else {
-        HttpResponse::Unauthorized().body("User Lacks authority to create a show")
+        HttpResponse::Unauthorized().json("User Lacks authority to create a show")
     }
 }
 
